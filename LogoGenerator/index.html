@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 
-	<script src="js/jquery.min.js"></script>
 
 	<meta charset="utf-8">
 	<title>Logo Generator</title>
@@ -17,11 +16,41 @@
 
 <body>
 
-	<h1>Logo Generator</h1>
+	<h1>Logo Generator</h1> <!-- Will be updated if the user select any specific event -->
+
+    <section id="eventList" class="sectionAsPage">
+        <svg id="eventsSVG"></svg>
+    </section>
+
+    <section id="logoGenerator" class="sectionAsPage hide">
+        <h2>Logos</h2>
+        <svg id="logosSVG"></svg>
+
+        <h2>Sequence</h2>
+        <input type="text" id="typefield_sequence" value="">
+        <button type="button" name="button" id="confirm_sequence">Confirm</button>
+
+        <div class="multiInlineInputs">
+            <h2>Row</h2>
+            <input type="text" id="typefield_rowNum" value="2">
+
+            <h2>Number of each row</h2>
+            <span id="multiTypefieldSpan">
+                <!-- <input type="text" class="typefield_Nums" id="typefield_Num_1" value="">
+                <input type="text" class="typefield_Nums" id="typefield_Num_2" value=""> -->
+                <p class="typefield_Nums" id="typefield_Num_last"></p>
+            </span>
+        </div>
+
+        <h2>Quick Review</h2>
+        <svg id="quickReviewSVG"></svg>
 
 
+    </section>
 
-	<script src="js/d3.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="../js/d3.min.js"></script>
     <script type="text/javascript" src="script.js"></script>
 
 
