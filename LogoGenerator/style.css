@@ -1,3 +1,17 @@
 .hide{
   display: none;
 }
+
+
+.uploadedLogoDiv{
+  display: inline-block;
+  text-align: center;
+  margin: 1em 1em;
+  vertical-align: middle;
+}
+
+.uploadedLogoDiv img{
+  display: block;
+  height: 2em;
+  margin: 0 auto;
+}
