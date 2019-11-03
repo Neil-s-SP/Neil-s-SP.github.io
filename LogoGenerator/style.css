@@ -15,3 +15,30 @@
   height: 2em;
   margin: 0 auto;
 }
+
+.multiInlineInputs{
+  vertical-align: middle;
+}
+
+.inlineDiv{
+  display: inline-block;
+}
+
+.inlineDiv h2{
+  display: inline-block;
+}
+
+input.typefield_Nums {
+  margin-right: 1em;
+}
+
+.changeLine{
+  display: block;
+  margin-top: 0;
+}
+
+
+p.typefield_Nums{
+  display: inline-block;
+  margin: 0;
+}

@@ -7,7 +7,9 @@
 	<title>Logo Generator</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    <link rel="stylesheet" type="text/css" href="style.css">
+
 	<link href='http://fonts.googleapis.com/css?family=Lato:300, 400,700' rel='stylesheet' type='text/css'>
 
 </head>
@@ -31,15 +33,16 @@
         <button type="button" name="button" id="confirm_sequence">Confirm</button>
 
         <div class="multiInlineInputs">
-            <h2>Row</h2>
-            <input type="text" id="typefield_rowNum" value="2">
+            <div class="inlineDiv">
+                <h2>Row</h2>
+                <input class="changeLine" type="text" id="typefield_rowNum" value="">
+            </div>
 
-            <h2>Number of each row</h2>
-            <span id="multiTypefieldSpan">
-                <!-- <input type="text" class="typefield_Nums" id="typefield_Num_1" value="">
-                <input type="text" class="typefield_Nums" id="typefield_Num_2" value=""> -->
-                <p class="typefield_Nums" id="typefield_Num_last"></p>
-            </span>
+            <div class="inlineDiv">
+                <h2>Number of each row</h2>
+                <span class="changeLine" id="multiTypefieldSpan"></span>
+            </div>
+
         </div>
 
         <h2>Quick Review</h2>

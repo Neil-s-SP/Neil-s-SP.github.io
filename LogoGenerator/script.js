@@ -25,7 +25,7 @@
 
 
 
-// CREATE the list of events at #eventsSVG
+// F1: CREATE the list of events at #eventsSVG
     const generateEventList = (eventsData) => {
         var eventsSVG = d3.select("#eventsSVG")
                             .attr("width", svgWidth)
@@ -40,6 +40,7 @@
                                     .on("mouseout", function(){ eventItemColorChange(this, "white");})
                                     .on("click", (d) => {
                                         changePage("eventList", "logoGenerator");
+                                        // F4
                                         initiateLogoGenerator(d);
                                     })
 
@@ -59,14 +60,14 @@
                     .style("fill", "black")
     }
 
-    // When one item is hovered or hovernoted, the color of its rec will change
+    // F2: When one item is hovered or hovernoted, the color of its rec will change
         const eventItemColorChange = (thisEvent, targetColor) => {
             d3.select(thisEvent)
                 .select("rect")
                 .style("fill", targetColor)
         }
 
-    // When one item is selected: #eventList will be hided, and #logoGenerator will be unhided
+    // F3: When one item is selected: #eventList will be hided, and #logoGenerator will be unhided
         const changePage = (earlierPageId, nextPageId) => {
             var earlierPageSection = document.querySelector(`#${earlierPageId}`),
                 nextPageSection = document.querySelector(`#${nextPageId}`);
@@ -76,15 +77,23 @@
         }
 
 
-//INITIATE #logoGenerator
+// F4: INITIATE #logoGenerator
     const initiateLogoGenerator = (eventData) => {
+        // F5
         showUploadedLogos(eventData);
+
+        var presetData = eventData.presets;
+        // F6
+        initiateSequence(presetData);
+        // F7
+        initiateRowNum(presetData);
+        // F8
+        initiateEachRow(presetData);
+        // F9
     }
 
-    // Initiate the #logosSVG according to the logos based on the recording JSON file
+    // F5: Initiate the #logosSVG according to the logos based on the recording JSON file
         const showUploadedLogos = (eventData) => {
-
-            console.log("showUploadedLogos used");
             var logoNames = eventData.logos,  // logoNames: ["1", "2", ...]
                 eventName = eventData.name;
 
@@ -113,59 +122,95 @@
                                 .attr("src", "./assets/uploadLogo.png")
                                 .style("height", "4em")
                                 .on("mouseover", function() {d3.select(this).attr("src", "./assets/uploadLogo_hover.png")})
-                                .on("mouseout", function() {d3.select(this).attr("src", "./assets/uploadLogo.png")});
-
-
-
-
+                                .on("mouseout", function() {d3.select(this).attr("src", "./assets/uploadLogo.png")})
+                                .on("click", function(){
+                                    //F10
+                                });
 
 
         }
 
 
-    // Initiate the value of #typefield_sequence based on the recording JSON file
+    // F6: Initiate the value of #typefield_sequence based on the recording JSON file
+        const initiateSequence = (presetData) => {
+            var type_sequence = d3.select("#typefield_sequence")
+                                    .attr("value", presetData.typefield_sequence)
+                                    .style("color","grey")
+                                    .on("input", function(){
+                                        this.style.color = "black";
+                                    });
+
+            const confirm_sequence = d3.select("#confirm_sequence")
+                                        .on("click", function(){
+                                            console.log("sequence updated")
+                                            // F12
+                                        });
+        }
 
 
+    // F7: Initiate the value of #typefield_rowNum based on the recording JSON file
+        const initiateRowNum = (presetData) => {
+            var type_row = d3.select("#typefield_rowNum")
+                                .attr("value", presetData.typefield_rowNum)
+                                .style("color","grey")
+                                .on("input", function(){
+                                    this.style.color = "black";
+                                    console.log("row updated")
+                                    // F14
+                                });
+    }
 
-    // Initiate the value of #typefield_rowNum based on the recording JSON file
+
+    // F8: Initiate the values of .typefield_Nums based on the recording JSON file
+        const initiateEachRow = (presetData) => {
+            var rowNum = presetData.typefield_rowNum;
+
+            var type_eachRows = d3.select("#multiTypefieldSpan")
+                                    .selectAll(".typefield_Nums")
+                                    .data(presetData.typefield_Nums)
+                                    .enter()
+                                    .append((d, i) => {
+                                        let thisType =  (i < rowNum-1) ? "input" : "p";
+                                        return document.createElement(thisType);
+                                    })
+                                    .attr("class", "typefield_Nums")
+                                    .attr("id", (d, i) => (i < rowNum-1) ? `typefield_Num_${i}` : "typefield_Num_last")
+                                    .attr("value", (d, i) => (i < rowNum-1) ? `typefield_Num_${i}` : "")
+                                    .attr("type", (d, i) => (i < rowNum-1) ? "text" : "")
+                                    .text((d, i) => (i < rowNum-1) ? "" : d);
+        }
 
 
-
-    // Initiate the values of .typefield_Nums based on the recording JSON file
-
-
-
-    // Generate the #quickReviewSVG based on the values of #typefield_sequence, #typefield_rowNum, and .typefield_Nums
+    // F9: Generate the #quickReviewSVG based on the values of #typefield_sequence, #typefield_rowNum, and .typefield_Nums
 
 
 
 
 //UPDATE #logoGenerator
 
-    // When new logo is added, rename it, update the #logosSVG, and update the values of #typefield_sequence, update #typefield_Num_last, and regenerate #quickReviewSVG accordingly
+    // F10: When new logo is added, rename it, update the #logosSVG, and update the values of #typefield_sequence, update #typefield_Num_last, and regenerate #quickReviewSVG accordingly
 
 
-    // When #logosSVG is updated, the recording JSON file should be updated
+    // F11: When #logosSVG is updated, the recording JSON file should be updated
 
 
-
-    // When #typefield_sequence is updated, the recording JSON file should be updated
-
-
-    // When the value of #confirm_sequence is clicked, #typefield_sequence is updated, regenerate the #quickReviewSVG accordingly
+    // F12: When the value of #confirm_sequence is clicked, #typefield_sequence is updated, regenerate the #quickReviewSVG accordingly
 
 
-    // When the value of #typefield_rowNum is changed, update the recording JSON file, re-initiate values of .typefield_Nums and generate them, regenerate the #quickReviewSVG accordingly
+    // F13: When #typefield_sequence is updated, the recording JSON file should be updated
 
 
-    // When a value of .typefield_Nums is changed, update the #typefield_Num_last, update the recording JSON file, regenerate the #quickReviewSVG accordingly
+    // F14: When the value of #typefield_rowNum is changed, update the recording JSON file, re-initiate values of .typefield_Nums and generate them, regenerate the #quickReviewSVG accordingly
 
 
+    // F15: When a value of .typefield_Nums is changed, update the #typefield_Num_last, update the recording JSON file, regenerate the #quickReviewSVG accordingly
 
 
 
 
-//AUXILIARY FUNCTIONS
+
+
+// F16: AUXILIARY FUNCTIONS
     const convertNumToLetter = (num) => {
         return String.fromCharCode(num+64);
     }
