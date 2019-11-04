@@ -4,11 +4,14 @@
 //Get the window's width and hight
     const windowWidth = window.innerWidth,
             windowHeight = window.innerHeight;
-    const svgWidth = windowWidth * 0.8,
+    const svgWidth = windowWidth * 0.95,
             svgHeight_list = windowHeight * 0.8,
-            svgHeight_logos = windowHeight * 0.3,
-            svgHeight_result = windowHeight * 0.5;
-    const uploadedLogoHeight = svgHeight_logos * 0.3;
+            // svgHeight_logos = windowHeight * 0.3,
+            svgHeight_result = windowHeight * 0.4;
+    const uploadedLogoHeight = svgHeight_result * 0.3;
+
+
+
 
 
 
@@ -18,7 +21,7 @@
     d3.json("./storage/record.json").then(function(data){
         var events = data.events;
 
-        generateEventList(events)
+        initialization(events)
 
 
     });
@@ -26,7 +29,7 @@
 
 
 // F1: CREATE the list of events at #eventsSVG
-    const generateEventList = (eventsData) => {
+    const initialization = (eventsData) => {
         var eventsSVG = d3.select("#eventsSVG")
                             .attr("width", svgWidth)
                             .attr("height", svgHeight_list);
@@ -79,10 +82,13 @@
 
 // F4: INITIATE #logoGenerator
     const initiateLogoGenerator = (eventData) => {
-        // F5
-        showUploadedLogos(eventData);
+        var eventName = eventData.name,
+            logoNames = eventData.logos, // logoNames: ["1", "2", ...]
+            presetData = eventData.presets;
 
-        var presetData = eventData.presets;
+        // F5
+        showUploadedLogos(eventName, logoNames);
+
         // F6
         initiateSequence(presetData);
         // F7
@@ -90,12 +96,11 @@
         // F8
         initiateEachRow(presetData);
         // F9
+        generateLogoCollection(eventName, presetData);
     }
 
     // F5: Initiate the #logosSVG according to the logos based on the recording JSON file
-        const showUploadedLogos = (eventData) => {
-            var logoNames = eventData.logos,  // logoNames: ["1", "2", ...]
-                eventName = eventData.name;
+        const showUploadedLogos = (eventName, logoNames) => {
 
             var uploadedLogosDiv = d3.select("#uploadedLogos");
 
@@ -177,12 +182,63 @@
                                     .attr("id", (d, i) => (i < rowNum-1) ? `typefield_Num_${i}` : "typefield_Num_last")
                                     .attr("value", (d, i) => (i < rowNum-1) ? `typefield_Num_${i}` : "")
                                     .attr("type", (d, i) => (i < rowNum-1) ? "text" : "")
-                                    .text((d, i) => (i < rowNum-1) ? "" : d);
+                                    .text((d, i) => (i < rowNum-1) ? "" : d)
+                                    .style("color",(d, i) => (i < rowNum-1) ? "grey" : "black")
+                                    .on("input", function(){
+                                        // F14
+                                    });
         }
 
 
     // F9: Generate the #quickReviewSVG based on the values of #typefield_sequence, #typefield_rowNum, and .typefield_Nums
+        const generateLogoCollection = (eventName, presetData) => {
+            var allLogos = presetData.typefield_sequence.split(","),
+                rowNum = presetData.typefield_rowNum,
+                eachRowNums = presetData.typefield_Nums;
 
+
+            // define the svg
+            var reviewSVG = d3.select("#quickReviewSVG")
+                                .attr("width", svgWidth)
+                                .attr("height", svgHeight_result)
+                                .style("border", "grey")
+                                .style("border-style", "solid")
+                                .style("border-width", "1px")
+
+            // input the logosSVG
+                // for each row, get the correlated logosSVG
+                    var currentLogoIndex = -1;
+                    var svgLogoPaddingLeft = svgWidth / getBiggestNum(eachRowNums) * 0.3,
+                        svgLogoRowHeight = svgHeight_result * 1 / getBiggestNum(eachRowNums),
+                        svgResultPaddingTop = svgHeight_result * 0.4 / getBiggestNum(eachRowNums);
+                    // console.log(svgLogoPadding)
+
+                    for(let row = 0; row < rowNum; row ++){
+                        var numAtThisRow = eachRowNums[row];
+                        // at each row
+                            currentLogoX = svgLogoPaddingLeft;
+                            for(let i = 0; i < numAtThisRow; i ++){
+                                console.log(currentLogoX)
+
+                                currentLogoIndex += 1;
+                                let thisLogoCap = allLogos[currentLogoIndex],
+                                    thisImgSrc = `storage/${eventName}/${convertCapLetterToNum(thisLogoCap)}.png`;
+                                let thisLogoId = `logo_${thisLogoCap}`
+
+                                let thisLogo = reviewSVG.append("image")
+                                                        .attr('id', thisLogoId)
+                                                        .attr('xlink:href', thisImgSrc)
+                                                        .attr('height', svgLogoRowHeight)
+                                                        .attr('x', currentLogoX)
+                                                        .attr('y', row * (svgLogoRowHeight + svgResultPaddingTop)+ svgResultPaddingTop)
+                                                        // .attr('width', 200)
+                                // console.log(getImgWidth(thisLogo))
+                                currentLogoX += getImgWidth(thisLogoId) + svgLogoPaddingLeft;
+
+
+                            }
+                    }
+        }
 
 
 
@@ -210,7 +266,21 @@
 
 
 
-// F16: AUXILIARY FUNCTIONS
+// AUXILIARY FUNCTIONS
     const convertNumToLetter = (num) => {
         return String.fromCharCode(num+64);
+    }
+
+    const convertCapLetterToNum = (capLetter) => {
+        return capLetter.charCodeAt(0) - 64;
+    }
+
+    const getImgWidth = (imgId) => {
+        let width = $(`#${imgId}`).width();
+        console.log(width)
+        return width;
+    }
+
+    const getBiggestNum = (array) => {
+        return Math.max(...array);
     }
