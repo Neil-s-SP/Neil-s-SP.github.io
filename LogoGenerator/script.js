@@ -1,3 +1,4 @@
+//NOTE:
 //String.fromCharCode(1+64) gives you 'A', String.fromCharCode(2+64) gives you 'B'
 
 
@@ -9,9 +10,6 @@
             // svgHeight_logos = windowHeight * 0.3,
             svgHeight_result = windowHeight * 0.4;
     const uploadedLogoHeight = svgHeight_result * 0.3;
-
-
-
 
 
 
@@ -90,7 +88,7 @@
         showUploadedLogos(eventName, logoNames);
 
         // F6
-        initiateSequence(presetData);
+        initiateSequence(presetData, eventName);
         // F7
         initiateRowNum(presetData);
         // F8
@@ -102,9 +100,9 @@
     // F5: Initiate the #logosSVG according to the logos based on the recording JSON file
         const showUploadedLogos = (eventName, logoNames) => {
 
-            var uploadedLogosDiv = d3.select("#uploadedLogos");
+            let uploadedLogosDiv = d3.select("#uploadedLogos");
 
-            var logoDivs = uploadedLogosDiv.selectAll(".uploadedLogoDiv")
+            let logoDivs = uploadedLogosDiv.selectAll(".uploadedLogoDiv")
                                             .data(logoNames)
                                             .enter()
                                             .append("div")
@@ -112,7 +110,11 @@
                                             .attr("id", (d) => `logo_${d}`);
 
             logoDivs.append("img")
-                    .attr("src", (d) => `./storage/${eventName}/${d}.png`);
+                    .attr("src", (d) => `./storage/${eventName}/${d}.png`)
+                    .attr("id", function(d){
+                        // console.log(this.clientWidth)
+                        return `logoImg_${d}`;
+                    });
 
             logoDivs.append("p")
                     .text((d) => convertNumToLetter(Number(d)));
@@ -132,12 +134,11 @@
                                     //F10
                                 });
 
-
         }
 
 
     // F6: Initiate the value of #typefield_sequence based on the recording JSON file
-        const initiateSequence = (presetData) => {
+        const initiateSequence = (presetData, eventName) => {
             var type_sequence = d3.select("#typefield_sequence")
                                     .attr("value", presetData.typefield_sequence)
                                     .style("color","grey")
@@ -145,10 +146,11 @@
                                         this.style.color = "black";
                                     });
 
-            const confirm_sequence = d3.select("#confirm_sequence")
+            const review_button = d3.select("#review_button")
                                         .on("click", function(){
                                             console.log("sequence updated")
                                             // F12
+                                            updateSequence(presetData, eventName);
                                         });
         }
 
@@ -211,19 +213,19 @@
                     var svgLogoPaddingLeft = svgWidth / getBiggestNum(eachRowNums) * 0.3,
                         svgLogoRowHeight = svgHeight_result * 1 / getBiggestNum(eachRowNums),
                         svgResultPaddingTop = svgHeight_result * 0.4 / getBiggestNum(eachRowNums);
-                    // console.log(svgLogoPadding)
 
                     for(let row = 0; row < rowNum; row ++){
                         var numAtThisRow = eachRowNums[row];
                         // at each row
                             currentLogoX = svgLogoPaddingLeft;
                             for(let i = 0; i < numAtThisRow; i ++){
-                                console.log(currentLogoX)
+                                // console.log(currentLogoX)
 
                                 currentLogoIndex += 1;
                                 let thisLogoCap = allLogos[currentLogoIndex],
-                                    thisImgSrc = `storage/${eventName}/${convertCapLetterToNum(thisLogoCap)}.png`;
-                                let thisLogoId = `logo_${thisLogoCap}`
+                                    thisLogoName = convertCapLetterToNum(thisLogoCap),
+                                    thisImgSrc = `storage/${eventName}/${thisLogoName}.png`;
+                                let thisLogoId = `logo_${thisLogoCap}`;
 
                                 let thisLogo = reviewSVG.append("image")
                                                         .attr('id', thisLogoId)
@@ -231,9 +233,7 @@
                                                         .attr('height', svgLogoRowHeight)
                                                         .attr('x', currentLogoX)
                                                         .attr('y', row * (svgLogoRowHeight + svgResultPaddingTop)+ svgResultPaddingTop)
-                                                        // .attr('width', 200)
-                                // console.log(getImgWidth(thisLogo))
-                                currentLogoX += getImgWidth(thisLogoId) + svgLogoPaddingLeft;
+                                currentLogoX += getImgWidth(thisLogoName, svgLogoRowHeight) + svgLogoPaddingLeft;
 
 
                             }
@@ -250,7 +250,15 @@
     // F11: When #logosSVG is updated, the recording JSON file should be updated
 
 
-    // F12: When the value of #confirm_sequence is clicked, #typefield_sequence is updated, regenerate the #quickReviewSVG accordingly
+    // F12: When the value of #review_button is clicked, #typefield_sequence is updated, regenerate the #quickReviewSVG accordingly
+        const updateSequence = (presetData, eventName) => {
+            //get the current sequence
+                let thisSequence = d3.select("#typefield_sequence").attr("value");
+            //then update the current sequence to the database
+
+            //refresh the current review
+                refreshReview(eventName, presetData);
+        }
 
 
     // F13: When #typefield_sequence is updated, the recording JSON file should be updated
@@ -275,12 +283,34 @@
         return capLetter.charCodeAt(0) - 64;
     }
 
-    const getImgWidth = (imgId) => {
-        let width = $(`#${imgId}`).width();
-        console.log(width)
-        return width;
+
+    const getImgWHRatio = (logImgId) => {
+        let thisImg = d3.select(`#${logImgId}`).node(),
+            // width = Number(thisImg.style("width").slice(0, -2)),
+            // height = Number(thisImg.style("height").slice(0, -2));
+                width = thisImg.clientWidth,
+                height = thisImg.clientHeight;
+        // console.log(thisImg);
+        // console.log(width);
+        // console.log(height);
+        // console.log(width/height);
+        return width/height;
+    }
+
+    const getImgWidth = (thisLogoName, height) => {
+        let thisLogoImgId = `logoImg_${thisLogoName}`;
+        return getImgWHRatio(thisLogoImgId) * height;
     }
 
     const getBiggestNum = (array) => {
         return Math.max(...array);
+    }
+
+    const refreshReview = (eventName, presetData) => {
+        //remove the current review
+            d3.select("#quickReviewSVG").selectAll("*").remove();
+            console.log("old review removed");
+        //regenerate the review
+            generateLogoCollection(eventName, presetData);
+            console.log("new review genereated");
     }
